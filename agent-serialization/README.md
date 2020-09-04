@@ -12,7 +12,7 @@ This example shows how JSON serialization rules can be easily defined for
 mkdir build
 cd build
 cmake ..
-cmake --build .
+make
 ```
 
 # Run
