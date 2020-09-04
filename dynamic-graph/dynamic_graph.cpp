@@ -30,6 +30,7 @@ void print_global_graph(
 
 void init_graph(
 		std::array<DistributedId, 5>& nodes,
+		std::array<DistributedId, 4>& edges,
 		fpmas::api::graph::DistributedGraph<int>& graph) {
 	graph.clear();
 	fpmas::api::load_balancing::PartitionMap partition;
@@ -38,10 +39,10 @@ void init_graph(
 			nodes[i] = graph.buildNode(0)->getId();
 
 		auto n_2 = graph.getNode(nodes[2]);
-		graph.link(graph.getNode(nodes[0]), n_2, INIT_LAYER);
-		graph.link(graph.getNode(nodes[1]), n_2, INIT_LAYER);
-		graph.link(n_2, graph.getNode(nodes[3]), INIT_LAYER);
-		graph.link(n_2, graph.getNode(nodes[4]), INIT_LAYER);
+		edges[0] = graph.link(graph.getNode(nodes[0]), n_2, INIT_LAYER)->getId();
+		edges[1] = graph.link(graph.getNode(nodes[1]), n_2, INIT_LAYER)->getId();
+		edges[2] = graph.link(n_2, graph.getNode(nodes[3]), INIT_LAYER)->getId();
+		edges[3] = graph.link(n_2, graph.getNode(nodes[4]), INIT_LAYER)->getId();
 
 		partition[nodes[0]] = 1;
 		partition[nodes[1]] = 1;

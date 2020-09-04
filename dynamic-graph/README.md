@@ -5,10 +5,10 @@ Management wiki
 page](https://github.com/FPMAS/FPMAS/wiki/Dynamic-Distributed-Graph-Management).
 
 An executable is built for each operation :
-- `fpmas-link`
-- `fpmas-build-node`
-- `fpmas-unlink`
-- `fpmas-remove-node`
+- [Link](#link) : `fpmas-link`
+- [buildNode](#build-node) : `fpmas-build-node`
+- [unlink](#unlink) : `fpmas-unlink`
+- [removeNode](#remove-node) : `fpmas-remove-node`
 
 # Build
 All targets can be built with the following script :
@@ -56,6 +56,9 @@ layer `INITIAL_LAYER`, and edges created dynamically are linked on layer
 `DYNAMIC_LAYER`.
 
 # Link
+Example based on the [link
+operation](https://github.com/FPMAS/FPMAS/wiki/Dynamic-Distributed-Graph-Management#link).
+
 ## Code
 See [link.cpp](link.cpp).
 
@@ -63,8 +66,9 @@ See [link.cpp](link.cpp).
 fpmas::communication::MpiCommunicator comm;
 fpmas::DistributedGraph<int, SYNC_MODE> graph {comm};
 std::array<DistributedId, 5> nodes;
+std::array<DistributedId, 4> edges;
 
-init_graph(nodes, graph);
+init_graph(nodes, edges, graph);
 
 FPMAS_ON_PROC(comm, 0) {
 	auto n_2 = graph.getNode(nodes[2]);
@@ -88,6 +92,10 @@ graph.synchronize();
 ```
 
 ## Output
+
+```
+mpiexec -n 2 ./fpmas-link
+```
 
 ```
 == SYNC_MODE : HardSyncMode
@@ -166,6 +174,10 @@ graph.synchronize();
 
 
 # Build Node
+
+Example based on the [buildNode
+operation](https://github.com/FPMAS/FPMAS/wiki/Dynamic-Distributed-Graph-Management#build-node).
+
 ## Code
 See [build_node.cpp](build_node.cpp).
 
@@ -173,8 +185,9 @@ See [build_node.cpp](build_node.cpp).
 fpmas::communication::MpiCommunicator comm;
 fpmas::DistributedGraph<int, SYNC_MODE> graph {comm};
 std::array<DistributedId, 5> nodes;
+std::array<DistributedId, 4> edges;
 
-init_graph(nodes, graph);
+init_graph(nodes, edges, graph);
 
 FPMAS_ON_PROC(comm, 0) {
 	auto n_2 = graph.getNode(nodes[2]);
@@ -196,6 +209,10 @@ graph.synchronize();
 ```
 
 ## Output
+
+```
+mpiexec -n 2 ./fpmas-build-node
+```
 
 ```
 == SYNC_MODE : HardSyncMode
@@ -277,4 +294,197 @@ those two nodes are `DISTANT` from process 1.
 
 # Unlink
 
+Example based on the [unlink
+operation](https://github.com/FPMAS/FPMAS/wiki/Dynamic-Distributed-Graph-Management#unlink).
+
+## Code
+
+```cpp
+fpmas::communication::MpiCommunicator comm;
+fpmas::DistributedGraph<int, SYNC_MODE> graph {comm};
+std::array<DistributedId, 5> nodes;
+std::array<DistributedId, 4> edges;
+
+init_graph(nodes, edges, graph);
+
+FPMAS_ON_PROC(comm, 0) {
+	auto n_2 = graph.getNode(nodes[2]);
+	// Binds task t to n_2
+	auto t = FPMAS_NODE_TASK(n_2, {
+			// Unlinks edges from n_0 to n_2
+			graph.unlink(graph.getEdge(edges[0]));
+
+			// Unlinks edges from n_2 to n_0
+			graph.unlink(graph.getEdge(edges[2]));
+
+			// Unlinks edges from n_2 to n_0
+			graph.unlink(graph.getEdge(edges[3]));
+
+			});
+	// Run the task on process 0
+	t.run();
+}
+// Synchronize the graph from all processes
+graph.synchronize();
+```
+
+## Output
+
+```
+mpiexec -n 2 ./fpmas-unlink
+```
+
+```
+== SYNC_MODE : HardSyncMode
+
+==========================
+== Initial distribution ==
+==========================
+== [Process 0] ==
+== Local Nodes :
+- [0:4] [DISTANT]
+- [0:3] [DISTANT]
+- [0:2] [LOCAL]
+- [0:1] [DISTANT]
+- [0:0] [DISTANT]
+== Local edges :
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:2] : [0:2] -> [0:3] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+- [0:0] : [0:0] -> [0:2] (INIT_LAYER)
+
+== [Process 1] ==
+== Local Nodes :
+- [0:2] [DISTANT]
+- [0:0] [LOCAL]
+- [0:1] [LOCAL]
+- [0:3] [LOCAL]
+- [0:4] [LOCAL]
+== Local edges :
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:2] : [0:2] -> [0:3] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+- [0:0] : [0:0] -> [0:2] (INIT_LAYER)
+
+==========================
+==  Final distribution  ==
+==========================
+== [Process 0] ==
+== Local Nodes :
+- [0:2] [LOCAL]
+- [0:1] [DISTANT]
+== Local edges :
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+
+== [Process 1] ==
+== Local Nodes :
+- [0:2] [DISTANT]
+- [0:0] [LOCAL]
+- [0:1] [LOCAL]
+- [0:3] [LOCAL]
+- [0:4] [LOCAL]
+== Local edges :
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+```
+
+### Analysis
+- Edges `[0:0]`, `[0:2]` and `[0:3]` are erased from process 0 **and** from
+  process 1
+- Nodes `[0:0]`, `[0:2]` and `[0:3]` are erased from process 0, since they are
+  `DISTANT` nodes disconnected from the local representation of the graph on
+  process 0
+
 # Remove Node
+
+Example based on the [removeNode 
+operation](https://github.com/FPMAS/FPMAS/wiki/Dynamic-Distributed-Graph-Management#remove-node).
+
+## Code
+```cpp
+fpmas::communication::MpiCommunicator comm;
+fpmas::DistributedGraph<int, SYNC_MODE> graph {comm};
+std::array<DistributedId, 5> nodes;
+std::array<DistributedId, 4> edges;
+
+init_graph(nodes, edges, graph);
+
+FPMAS_ON_PROC(comm, 0) {
+	auto n_2 = graph.getNode(nodes[2]);
+	// Binds task t to n_2
+	auto t = FPMAS_NODE_TASK(n_2, {
+			// Removes DISTANT node 3
+			graph.removeNode(graph.getNode(nodes[3]));
+			// Removes DISTANT node 0
+			graph.removeNode(graph.getNode(nodes[0]));
+			});
+	// Run the task on process 0
+	t.run();
+}
+// Synchronize the graph from all processes
+graph.synchronize();
+```
+
+## Output
+
+```
+mpiexec -n 2 ./fpmas-remove-node
+```
+
+```
+== SYNC_MODE : HardSyncMode
+
+==========================
+== Initial distribution ==
+==========================
+== [Process 0] ==
+== Local Nodes :
+- [0:4] [DISTANT]
+- [0:3] [DISTANT]
+- [0:2] [LOCAL]
+- [0:1] [DISTANT]
+- [0:0] [DISTANT]
+== Local edges :
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:2] : [0:2] -> [0:3] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+- [0:0] : [0:0] -> [0:2] (INIT_LAYER)
+
+== [Process 1] ==
+== Local Nodes :
+- [0:2] [DISTANT]
+- [0:0] [LOCAL]
+- [0:1] [LOCAL]
+- [0:3] [LOCAL]
+- [0:4] [LOCAL]
+== Local edges :
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:2] : [0:2] -> [0:3] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+- [0:0] : [0:0] -> [0:2] (INIT_LAYER)
+
+==========================
+==  Final distribution  ==
+==========================
+== [Process 0] ==
+== Local Nodes :
+- [0:4] [DISTANT]
+- [0:2] [LOCAL]
+- [0:1] [DISTANT]
+== Local edges :
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+
+== [Process 1] ==
+== Local Nodes :
+- [0:2] [DISTANT]
+- [0:1] [LOCAL]
+- [0:4] [LOCAL]
+== Local edges :
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+```
+
+### Analysis
+- Nodes `[0:0]` and `[0:3]` are removed from process 0 **and** process 1
+- Edges connected to those nodes (`[0:0]` and `[0:2]`) are removed from process 0 **and** process 1
+

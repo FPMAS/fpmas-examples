@@ -25,15 +25,10 @@ int main(int argc, char** argv) {
 			auto n_2 = graph.getNode(nodes[2]);
 			// Binds task t to n_2
 			auto t = FPMAS_NODE_TASK(n_2, {
-					// Links n_2 to the n_4
-					graph.link(n_2, graph.getNode(nodes[4]), DYNAMIC_LAYER);
-
-					// Links n_0 to n_3
-					graph.link(
-							graph.getNode(nodes[0]),
-							graph.getNode(nodes[3]),
-							DYNAMIC_LAYER);
-
+					// Removes DISTANT node 3
+					graph.removeNode(graph.getNode(nodes[3]));
+					// Removes DISTANT node 0
+					graph.removeNode(graph.getNode(nodes[0]));
 					});
 			// Run the task on process 0
 			t.run();

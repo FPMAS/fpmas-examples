@@ -10,6 +10,7 @@ int main(int argc, char** argv) {
 		fpmas::communication::MpiCommunicator comm;
 		fpmas::DistributedGraph<int, SYNC_MODE> graph {comm};
 		std::array<DistributedId, 5> nodes;
+		std::array<DistributedId, 4> edges;
 
 		FPMAS_ON_PROC(comm, 0) {
 			std::cout << "== SYNC_MODE : " << STRING(SYNC_MODE) << std::endl;
@@ -18,7 +19,7 @@ int main(int argc, char** argv) {
 			std::cout << "== Initial distribution ==" << std::endl;
 			std::cout << "==========================" << std::endl;
 		}
-		init_graph(nodes, graph);
+		init_graph(nodes, edges, graph);
 		print_global_graph(comm, graph);
 
 		FPMAS_ON_PROC(comm, 0) {

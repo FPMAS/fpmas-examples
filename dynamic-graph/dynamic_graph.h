@@ -12,4 +12,5 @@ void print_global_graph(
 
 void init_graph(
 		std::array<DistributedId, 5>& nodes,
+		std::array<DistributedId, 4>& edges,
 		fpmas::api::graph::DistributedGraph<int>& graph);
