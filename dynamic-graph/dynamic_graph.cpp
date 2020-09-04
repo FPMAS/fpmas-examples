@@ -3,7 +3,7 @@
 #include <chrono>
 
 void print_local_graph(fpmas::api::graph::DistributedGraph<int>& graph) {
-	std::cout << "== [Proc " << graph.getMpiCommunicator().getRank() << "] ==" << std::endl;
+	std::cout << "== [Process " << graph.getMpiCommunicator().getRank() << "] ==" << std::endl;
 	std::cout << "== Local Nodes :" << std::endl;
 	for(auto node : graph.getNodes())
 		std::cout << "- " << node.first << " [" << node.second->state() << "]" << std::endl;

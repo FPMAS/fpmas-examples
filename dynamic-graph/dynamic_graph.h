@@ -2,8 +2,8 @@
 
 #define INIT_LAYER 0
 #define DYNAMIC_LAYER 1
-
-using fpmas::synchro::HardSyncMode;
+#define _STRING(X) #X
+#define STRING(X) _STRING(X)
 
 void print_local_graph(fpmas::api::graph::DistributedGraph<int>& graph);
 void print_global_graph(
