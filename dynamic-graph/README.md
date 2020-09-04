@@ -51,7 +51,119 @@ The local representation of the initial graph from process 0 is as followed :
 See [dynamic_graph.cpp](dynamic_graph.cpp) to see how the initial graph is
 built from process 0.
 
+To easily interpret the following output logs, initial edges are linked on
+layer `INITIAL_LAYER`, and edges created dynamically are linked on layer
+`DYNAMIC_LAYER`.
+
 # Link
+## Code
+See [link.cpp](link.cpp).
+
+```cpp
+fpmas::communication::MpiCommunicator comm;
+fpmas::DistributedGraph<int, SYNC_MODE> graph {comm};
+std::array<DistributedId, 5> nodes;
+
+init_graph(nodes, graph);
+
+FPMAS_ON_PROC(comm, 0) {
+	auto n_2 = graph.getNode(nodes[2]);
+	// Binds task t to n_2
+	auto t = FPMAS_NODE_TASK(n_2, {
+			// Links n_2 to the n_4
+			graph.link(n_2, graph.getNode(nodes[4]), DYNAMIC_LAYER);
+
+			// Links n_0 to n_3
+			graph.link(
+					graph.getNode(nodes[0]),
+					graph.getNode(nodes[3]),
+					DYNAMIC_LAYER);
+
+			});
+	// Run the task on process 0
+	t.run();
+}
+// Synchronize the graph from all processes
+graph.synchronize();
+```
+
+## Output
+
+```
+== SYNC_MODE : HardSyncMode
+
+==========================
+== Initial distribution ==
+==========================
+== [Process 0] ==
+== Local Nodes :
+- [0:4] [DISTANT]
+- [0:3] [DISTANT]
+- [0:2] [LOCAL]
+- [0:1] [DISTANT]
+- [0:0] [DISTANT]
+== Local edges :
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:2] : [0:2] -> [0:3] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+- [0:0] : [0:0] -> [0:2] (INIT_LAYER)
+
+== [Process 1] ==
+== Local Nodes :
+- [0:2] [DISTANT]
+- [0:0] [LOCAL]
+- [0:1] [LOCAL]
+- [0:3] [LOCAL]
+- [0:4] [LOCAL]
+== Local edges :
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:2] : [0:2] -> [0:3] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+- [0:0] : [0:0] -> [0:2] (INIT_LAYER)
+
+==========================
+==  Final distribution  ==
+==========================
+== [Process 0] ==
+== Local Nodes :
+- [0:4] [DISTANT]
+- [0:3] [DISTANT]
+- [0:2] [LOCAL]
+- [0:1] [DISTANT]
+- [0:0] [DISTANT]
+== Local edges :
+- [0:4] : [0:2] -> [0:4] (DYNAMIC_LAYER)
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:2] : [0:2] -> [0:3] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+- [0:0] : [0:0] -> [0:2] (INIT_LAYER)
+
+== [Process 1] ==
+== Local Nodes :
+- [0:2] [DISTANT]
+- [0:0] [LOCAL]
+- [0:1] [LOCAL]
+- [0:3] [LOCAL]
+- [0:4] [LOCAL]
+== Local edges :
+- [0:5] : [0:0] -> [0:3] (DYNAMIC_LAYER)
+- [0:4] : [0:2] -> [0:4] (DYNAMIC_LAYER)
+- [0:3] : [0:2] -> [0:4] (INIT_LAYER)
+- [0:2] : [0:2] -> [0:3] (INIT_LAYER)
+- [0:1] : [0:1] -> [0:2] (INIT_LAYER)
+- [0:0] : [0:0] -> [0:2] (INIT_LAYER)
+```
+
+### Analysis
+- Edges `[0:5]` and `[0:4]`, created on process 0, respectively connecting
+  `[0:0]` to `[0:3]` and `[0:2]` to `[0:4]` are automatically imported to
+  process 1, since `[0:3]` and `[0:4]` are `LOCAL` from process 1.
+- Edge `[0:2]`, connecting `[0:2]` to `[0:4]`, in represented on process 0,
+  since node `[0:2]` is `LOCAL` from process 0.
+- However, edge `[0:5]`, connecting `[0:0]` to `[0:3]`, **created on process
+  0**, in **not** represented on process 0 after graph synchronization, since
+  `[0:0]` and `[0:3]` are both `DISTANT` from process 0.
+
 
 # Build Node
 ## Code
@@ -153,8 +265,13 @@ graph.synchronize();
 - [0:1] : [0:1] -> [0:2] (INIT_LAYER)
 - [0:0] : [0:0] -> [0:2] (INIT_LAYER)
 ```
-Notice that the new node `[0:5]`, and links `[0:6]` and `[0:5]`, all
-created from process 0, are automatically imported to process 1. However, edge
+
+### Analysis
+- the new node `[0:5]`, created from process 0, has automatically been imported
+  to process 1 as a `DISTANT` node, since it is now connected to node `[0:3]`
+  and `[0:4]`, that are `LOCAL` from process 1
+- Same consideration for edges `[0:6]` and `[0:5]`
+- However, edge
 `[0:4]`, connecting `[0:2]` to `[0:5]`, is **not** imported on process 1, since
 those two nodes are `DISTANT` from process 1.
 
