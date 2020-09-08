@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 		print_agents(agent_group, comm.getRank());
 
 		// Initializes a new partition map
-		fpmas::api::load_balancing::PartitionMap map;
+		fpmas::api::graph::PartitionMap map;
 		// Assign each agent's node to proc 1
 		for(auto agent : agent_group.agents())
 			map[agent->get()->node()->getId()] = 1;

@@ -7,19 +7,17 @@ int main(int argc, char** argv) {
 	fpmas::init(argc, argv);
 	{
 		fpmas::communication::MpiCommunicator comm;
-		fpmas::DistributedGraph<int, SYNC_MODE> graph {comm};
+		fpmas::graph::DistributedGraph<int, SYNC_MODE> graph {comm};
 		std::array<DistributedId, 5> nodes;
 		std::array<DistributedId, 4> edges;
 
 		FPMAS_ON_PROC(comm, 0) {
 			std::cout << "== SYNC_MODE : " << STRING(SYNC_MODE) << std::endl;
 			std::cout << std::endl;
-			std::cout << "==========================" << std::endl;
-			std::cout << "== Initial distribution ==" << std::endl;
-			std::cout << "==========================" << std::endl;
+			print_banner("Initial Distribution");
 		}
 		init_graph(nodes, edges, graph);
-		print_global_graph(comm, graph);
+		print_global_graph(comm, graph, layers);
 
 		FPMAS_ON_PROC(comm, 0) {
 			auto n_2 = graph.getNode(nodes[2]);
@@ -42,11 +40,9 @@ int main(int argc, char** argv) {
 		graph.synchronize();
 
 		FPMAS_ON_PROC(comm, 0) {
-			std::cout << "==========================" << std::endl;
-			std::cout << "==  Final distribution  ==" << std::endl;
-			std::cout << "==========================" << std::endl;
+			print_banner("Final Distribution");
 		}
-		print_global_graph(comm, graph);
+		print_global_graph(comm, graph, layers);
 	}
 	fpmas::finalize();
 }

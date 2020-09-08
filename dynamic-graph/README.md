@@ -1,4 +1,4 @@
-# FPMAS Dynamic Graph Management example
+# FPMAS Dynamic Graph Management Example
 
 The complete working examples corresponding to the [Dynamic Distributed Graph
 Management wiki
