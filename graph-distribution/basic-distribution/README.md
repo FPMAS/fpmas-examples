@@ -21,6 +21,18 @@ cd build
 cmake ..
 make
 ```
+The default synchronization mode is
+[HardSyncMode](https://fpmas.github.io/FPMAS/classfpmas_1_1synchro_1_1hard_1_1HardSyncMode.html).
+However, dynamic graph operations are available in **any** synchronization
+mode. So, for the purpose of demonstration, the synchronization mode can be
+chosen at compile time, replacing the third line of the previous script by
+```
+cmake -DSYNC_MODE=<sync_mode> ..
+```
+Example :
+```
+cmake -DSYNC_MODE=GhostMode ..
+```
 
 # Run
 
