@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,-rpath -Wl,/usr/lib/openmpi -Wl,--enable-new-dtags -pthread CMakeFiles/zoltan-load-balancing.dir/main.cpp.o -o zoltan-load-balancing  -Wl,-rpath,/usr/lib/openmpi utils/libfpmas-example-utils.a -lfpmas -lzoltan /usr/lib/openmpi/libmpi_cxx.so /usr/lib/openmpi/libmpi.so 

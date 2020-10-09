@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfpmas-example-utils.a CMakeFiles/fpmas-example-utils.dir/utils.cpp.o
+/usr/bin/ranlib libfpmas-example-utils.a

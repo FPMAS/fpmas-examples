@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../../../utils/utils.h
+fpmas.h
+../../../../utils/fpmas.h
+
+/home/pbreugno/Development/c++/workspace/fpmas/fpmas-examples/distributed-graph/graph-distribution/basic-distribution/main.cpp
+fpmas.h
+/home/pbreugno/Development/c++/workspace/fpmas/fpmas-examples/distributed-graph/graph-distribution/basic-distribution/fpmas.h
+../utils/utils.h
+/home/pbreugno/Development/c++/workspace/fpmas/fpmas-examples/distributed-graph/graph-distribution/utils/utils.h
+

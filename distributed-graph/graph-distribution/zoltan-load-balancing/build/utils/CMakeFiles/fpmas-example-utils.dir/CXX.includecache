@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/pbreugno/Development/c++/workspace/fpmas/fpmas-examples/utils/utils.cpp
+utils.h
+/home/pbreugno/Development/c++/workspace/fpmas/fpmas-examples/utils/utils.h
+thread
+-
+chrono
+-
+
+/home/pbreugno/Development/c++/workspace/fpmas/fpmas-examples/utils/utils.h
+fpmas.h
+/home/pbreugno/Development/c++/workspace/fpmas/fpmas-examples/utils/fpmas.h
+
