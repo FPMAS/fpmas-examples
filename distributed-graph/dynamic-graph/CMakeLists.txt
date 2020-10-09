@@ -9,8 +9,8 @@ set(SYNC_MODE "HardSyncMode" CACHE STRING "Graph Synchronization mode")
 message("-- SYNC_MODE : ${SYNC_MODE}")
 
 
-add_subdirectory(../utils ${CMAKE_CURRENT_BINARY_DIR}/utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ../utils)
+add_subdirectory(../../utils ${CMAKE_CURRENT_BINARY_DIR}/utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ../../utils)
 
 add_library(fpmas-dynamic-graph
 	dynamic_graph.cpp)
