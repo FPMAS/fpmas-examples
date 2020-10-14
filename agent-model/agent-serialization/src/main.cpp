@@ -8,7 +8,6 @@
 FPMAS_JSON_SET_UP(AGENT_TYPES)
 
 using fpmas::communication::MpiCommunicator;
-using fpmas::model::DefaultModel;
 using fpmas::synchro::HardSyncMode;
 using fpmas::model::AgentGroup;
 
@@ -34,7 +33,7 @@ int main(int argc, char** argv) {
 	fpmas::init(argc, argv);
 	{
 		// Instantiates a DefaultModel
-		DefaultModel<HardSyncMode> model;
+		fpmas::model::Model<HardSyncMode> model;
 		MpiCommunicator& comm = model.getMpiCommunicator();
 
 		// Build a new agent group

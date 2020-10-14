@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 	FPMAS_REGISTER_AGENT_TYPES(Agent1, Agent2);
 	fpmas::init(argc, argv);
 	{
-		fpmas::model::DefaultModel<HardSyncMode> model;
+		fpmas::model::Model<HardSyncMode> model;
 
 		AgentGroup& group_1 = model.buildGroup(G1);
 		AgentGroup& group_2 = model.buildGroup(G2);

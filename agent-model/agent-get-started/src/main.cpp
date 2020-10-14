@@ -6,7 +6,7 @@
 
 FPMAS_JSON_SET_UP(AGENT_TYPES)
 
-using fpmas::model::DefaultModel;
+using fpmas::model::Model;
 using fpmas::synchro::HardSyncMode;
 using fpmas::model::AgentGroup;
 
@@ -17,8 +17,8 @@ int main(int argc, char** argv) {
 
 	fpmas::init(argc, argv);
 	{
-		// Instantiates a DefaultModel
-		DefaultModel<HardSyncMode> model;
+		// Instantiates a Model
+		Model<HardSyncMode> model;
 
 		// Build a new agent group
 		AgentGroup& agent_group = model.buildGroup(Group);
