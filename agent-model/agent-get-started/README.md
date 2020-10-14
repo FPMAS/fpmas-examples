@@ -1,7 +1,7 @@
 # FPMAS Get Started example
 
 The complete working example of the [Get Started wiki
-page](https://github.com/FPMAS/FPMAS/wiki/Get-Started).
+page](https://github.com/FPMAS/FPMAS/wiki/Agent-Get-Started).
 
 Two trivial types of Agents, `Agent1` and `Agent2`, are defined.
 On each process, one instance of each agent is added to an AgentGroup and
