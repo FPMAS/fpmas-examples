@@ -12,6 +12,8 @@ using fpmas::model::DefaultModel;
 using fpmas::synchro::HardSyncMode;
 using fpmas::model::AgentGroup;
 
+FPMAS_DEFINE_GROUPS(Group);
+
 /*
  * Utility function used to print agents of the group using json serialization.
  */
@@ -36,7 +38,7 @@ int main(int argc, char** argv) {
 		MpiCommunicator& comm = model.getMpiCommunicator();
 
 		// Build a new agent group
-		AgentGroup& agent_group = model.buildGroup();
+		AgentGroup& agent_group = model.buildGroup(Group);
 
 		// Initializes 3 agents on proc 0
 		FPMAS_ON_PROC(comm, 0) {

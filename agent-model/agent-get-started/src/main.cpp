@@ -10,6 +10,8 @@ using fpmas::model::DefaultModel;
 using fpmas::synchro::HardSyncMode;
 using fpmas::model::AgentGroup;
 
+FPMAS_DEFINE_GROUPS(Group);
+
 int main(int argc, char** argv) {
 	FPMAS_REGISTER_AGENT_TYPES(AGENT_TYPES);
 
@@ -19,7 +21,7 @@ int main(int argc, char** argv) {
 		DefaultModel<HardSyncMode> model;
 
 		// Build a new agent group
-		AgentGroup& agent_group = model.buildGroup();
+		AgentGroup& agent_group = model.buildGroup(Group);
 
 		// On each process, adds an agent of each type
 		agent_group.add(new Agent1);
