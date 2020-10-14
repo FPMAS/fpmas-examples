@@ -1,5 +1,7 @@
 #include "fpmas.h"
 #include "agents.h"
+#include <thread>
+#include <chrono>
 
 using fpmas::synchro::HardSyncMode;
 
@@ -20,12 +22,14 @@ int main(int argc, char** argv) {
 		AgentGroup& group_1 = model.buildGroup(G1);
 		AgentGroup& group_2 = model.buildGroup(G2);
 
-		Agent1* a1 = new Agent1;
-		Agent2* a2 = new Agent2;
-		group_1.add(a1);
-		group_1.add(a2);
+		group_1.add(new Agent1);
+		group_1.add(new Agent1);
+
+		group_2.add(new Agent1);
+		group_2.add(new Agent2);
 
 		print_agents(group_1, model.getMpiCommunicator());
+		print_agents(group_2, model.getMpiCommunicator());
 	}
 	fpmas::finalize();
 }
@@ -33,14 +37,19 @@ int main(int argc, char** argv) {
 void print_agents(const AgentGroup& group, MpiCommunicator& comm) {
 	for(int rank = 0; rank < comm.getSize(); rank++) {
 		FPMAS_ON_PROC(comm, rank) {
-			std::cout << "Group " << group.groupId() << " agents on process "
+			std::cout
+				<< "Group " << group.groupId() << " agents on process "
 				<< comm.getRank() << ":" << std::endl;
 			for(auto agent : group.localAgents()) {
-				std::cout << "- ID: " << agent->get()->node()->getId()
+				std::cout
+					<< "- ID: " << agent->get()->node()->getId()
 					<< ", Type: " << agent->get()->typeId().name()
 					<< std::endl;
 			}
+			if(rank == comm.getSize()-1)
+				std::cout << std::endl;
 		}
 		comm.barrier();
 	}
+	std::this_thread::sleep_for(std::chrono::duration<double>(.5));
 }
