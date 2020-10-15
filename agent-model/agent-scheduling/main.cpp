@@ -36,7 +36,8 @@ class PrintCurrentTimeStepTask : public fpmas::api::scheduler::Task {
 
 		void run() override {
 			FPMAS_ON_PROC(comm, 0)
-				std::cout << "== TimeStep: " << runtime.currentDate() << std::endl;
+				std::cout << std::endl << "== TimeStep: " << runtime.currentDate() << std::endl;
+			std::this_thread::sleep_for(std::chrono::duration<double>(.5));
 			comm.barrier();
 		}
 };
@@ -58,7 +59,11 @@ int main(int argc, char** argv) {
 		group_1.add(new Agent2);
 		group_1.add(new Agent2);
 
+		// Task to print time steps from process 0
 		PrintCurrentTimeStepTask print_time_step(model.runtime(), model.getMpiCommunicator());
+		// begin_task: void
+		// tasks: print_time_step
+		// end_task: void
 		fpmas::scheduler::Job print_time_step_job({print_time_step});
 
 		// Executed at 0.0, 1.0, 2.0...
@@ -71,24 +76,31 @@ int main(int argc, char** argv) {
 		// Executed at 0.2, 2.2, 4.2...
 		model.scheduler().schedule(0.2, 2, group_1.job());
 
+		// Task to print group_0
 		PrintAgentsTask print_group_0(group_0, model.getMpiCommunicator());
+		// Task to print group_1
 		PrintAgentsTask print_group_1(group_1, model.getMpiCommunicator());
 
-		// The order of execution of print_group_0 and print_group_1 is
-		// shuffled at each time step
-		fpmas::scheduler::Job print_groups_job({print_group_0, print_group_1});
+		// begin_task: print_group_0
+		// tasks: void
+		// end_task: print_group_1
+		fpmas::scheduler::Job print_groups_job(print_group_0, {}, print_group_1);
 
 		// Executed at 0.3, 1.3, 2.3, ...
 		model.scheduler().schedule(0.3, 1, print_groups_job);
 
+		// Runs the model for 4 TimeSteps
 		model.runtime().run(4);
 	}
 	fpmas::finalize();
 }
 
 void print_agents(const AgentGroup& group, MpiCommunicator& comm) {
+	if(comm.getRank() == 0)
+		std::cout << std::endl;
 	for(int rank = 0; rank < comm.getSize(); rank++) {
 		FPMAS_ON_PROC(comm, rank) {
+			std::this_thread::sleep_for(std::chrono::duration<double>(.5));
 			std::cout
 				<< "Group " << group.groupId() << " agents on process "
 				<< comm.getRank() << ":" << std::endl;
@@ -98,10 +110,7 @@ void print_agents(const AgentGroup& group, MpiCommunicator& comm) {
 					<< ", Type: " << agent->get()->typeId().name()
 					<< std::endl;
 			}
-			if(rank == comm.getSize()-1)
-				std::cout << std::endl;
 		}
 		comm.barrier();
 	}
-	std::this_thread::sleep_for(std::chrono::duration<double>(.5));
 }
