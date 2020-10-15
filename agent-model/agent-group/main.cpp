@@ -22,9 +22,11 @@ int main(int argc, char** argv) {
 		AgentGroup& group_1 = model.buildGroup(G1);
 		AgentGroup& group_2 = model.buildGroup(G2);
 
+		// Adds two Agent1 to group_1 on each process
 		group_1.add(new Agent1);
 		group_1.add(new Agent1);
 
+		// Adds an Agent1 and an Agent2 to group_2 on each process
 		group_2.add(new Agent1);
 		group_2.add(new Agent2);
 
