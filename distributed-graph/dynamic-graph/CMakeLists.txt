@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(fpmas-dynamic-graph)
 
 
-find_package(MPI REQUIRED)
+find_package(fpmas REQUIRED)
 
 set(SYNC_MODE "HardSyncMode" CACHE STRING "Graph Synchronization mode")
 message("-- SYNC_MODE : ${SYNC_MODE}")
@@ -16,7 +16,7 @@ add_library(fpmas-dynamic-graph
 	dynamic_graph.cpp)
 
 set(LIBRARIES
-	fpmas-example-utils fpmas-dynamic-graph fpmas MPI::MPI_CXX zoltan)
+	fpmas-example-utils fpmas-dynamic-graph fpmas::fpmas)
 
 # LINK
 set(LINK "fpmas-link")

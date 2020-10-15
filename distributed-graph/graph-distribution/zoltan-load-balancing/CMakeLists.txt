@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(zoltan-load-balancing)
 
 
-find_package(MPI REQUIRED)
+find_package(fpmas REQUIRED)
 
 set(SYNC_MODE "HardSyncMode" CACHE STRING "Graph Synchronization mode")
 message("-- SYNC_MODE : ${SYNC_MODE}")
@@ -17,4 +17,4 @@ add_executable(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC SYNC_MODE=${SYNC_MODE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC fpmas-example-utils fpmas MPI::MPI_CXX zoltan)
+target_link_libraries(${PROJECT_NAME} PUBLIC fpmas-example-utils fpmas::fpmas)

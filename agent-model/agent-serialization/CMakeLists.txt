@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(fpmas-agent-serialization)
 
-find_package(MPI REQUIRED)
+find_package(fpmas REQUIRED)
 
 add_executable(fpmas-agent-serialization
 	src/main.cpp
@@ -10,4 +10,4 @@ add_executable(fpmas-agent-serialization
 	)
 
 include_directories(fpmas-agent-serialization include)
-target_link_libraries(fpmas-agent-serialization PUBLIC fpmas MPI::MPI_CXX zoltan)
+target_link_libraries(fpmas-agent-serialization PUBLIC fpmas::fpmas)

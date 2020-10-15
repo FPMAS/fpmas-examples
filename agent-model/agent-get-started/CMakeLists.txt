@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(fpmas-get-started)
 
-find_package(MPI REQUIRED)
+find_package(fpmas REQUIRED)
 
 add_executable(fpmas-get-started
 	src/main.cpp
@@ -10,4 +10,4 @@ add_executable(fpmas-get-started
 	)
 
 include_directories(fpmas-get-started include)
-target_link_libraries(fpmas-get-started PUBLIC fpmas MPI::MPI_CXX zoltan)
+target_link_libraries(fpmas-get-started PUBLIC fpmas::fpmas)
