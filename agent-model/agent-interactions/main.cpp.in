@@ -1,0 +1,80 @@
+#include "fpmas.h"
+#include "agents.h"
+
+using fpmas::synchro::GhostMode;
+using fpmas::synchro::HardSyncMode;
+
+#define SYNC_MODE ${SYNC_MODE}
+
+FPMAS_JSON_SET_UP(AGENT_TYPES);
+
+FPMAS_DEFINE_GROUPS(DataGroup, ReaderWriterGroup);
+FPMAS_DEFINE_LAYERS(RW_TO_DATA);
+
+void build_model(fpmas::model::Model<SYNC_MODE>& model, fpmas::api::model::AgentGroup& group);
+void print_write_operations_count(fpmas::communication::MpiCommunicator& comm, fpmas::api::model::AgentGroup& group);
+
+int main(int argc, char** argv) {
+	FPMAS_REGISTER_AGENT_TYPES(AGENT_TYPES)
+	fpmas::init(argc, argv);
+	{
+		// Defines a default model
+		fpmas::model::Model<SYNC_MODE> model;
+
+		// Defines an agent group
+		fpmas::model::AgentGroup& group = model.buildGroup(ReaderWriterGroup);
+		
+		// Set up agents on process 0
+		FPMAS_ON_PROC(model.getMpiCommunicator(), 0) {
+			build_model(model, group);
+		}
+
+		// Schedules load balancing
+		model.scheduler().schedule(0, model.loadBalancingJob());
+
+		// Schedules agent group execution
+		model.scheduler().schedule(0.1, 1, group.job());
+		
+		// Runs the model for 2 iterations
+		model.runtime().run(4);
+
+		print_write_operations_count(model.getMpiCommunicator(), group);
+	}
+	fpmas::finalize();
+}
+
+void build_model(fpmas::model::Model<SYNC_MODE>& model, fpmas::api::model::AgentGroup& group) {
+	for(int i = 0; i < model.getMpiCommunicator().getSize(); i++) {
+		group.add(new DataAgent(0, 0));
+	}
+	for(int i = 0; i < model.getMpiCommunicator().getSize(); i++) {
+		auto* rw_agent = new ReaderWriterAgent;
+		// Add rw_agent to the group BEFORE linking it
+		group.add(rw_agent);
+		for(auto* data_agent : group.agents()) {
+			model.link(rw_agent, data_agent, RW_TO_DATA);
+		}
+	}
+}
+
+void print_write_operations_count(fpmas::communication::MpiCommunicator& comm, fpmas::api::model::AgentGroup& group) {
+	int write_received = 0;
+	for(auto* agent : group.localAgents())
+		if(auto* data_agent = dynamic_cast<DataAgent*>(agent))
+			write_received+=data_agent->received_write_count;
+
+	fpmas::communication::TypedMpi<int> mpi(comm);
+	std::vector<int> write_emitted_counts = mpi.gather(ReaderWriterAgent::emitted_write_count, 0);
+	std::vector<int> write_received_counts = mpi.gather(write_received, 0);
+	FPMAS_ON_PROC(comm, 0) {
+		int total_write_emitted_count = std::accumulate(
+				write_emitted_counts.begin(),
+				write_emitted_counts.end(), 0);
+		std::cout << "Total write operations emitted: " << total_write_emitted_count << std::endl;
+
+		int total_write_received_count = std::accumulate(
+				write_received_counts.begin(),
+				write_received_counts.end(), 0);
+		std::cout << "Total write operations received: " << total_write_received_count << std::endl;
+	}
+}
