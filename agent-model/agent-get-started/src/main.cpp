@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 		agent_group.add(new Agent2);
 
 		// Schedules the group to be executed at each iteration
-		model.scheduler().schedule(0, 1, agent_group.job());
+		model.scheduler().schedule(0, 1, agent_group.jobs());
 
 		// Runs 4 iterations of the model
 		model.runtime().run(NUM_STEP);

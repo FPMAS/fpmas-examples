@@ -7,11 +7,15 @@ using fpmas::synchro::HardSyncMode;
 
 using fpmas::communication::MpiCommunicator;
 using fpmas::model::AgentGroup;
+using fpmas::model::Behavior;
 
 FPMAS_JSON_SET_UP(Agent1, Agent2);
 FPMAS_DEFINE_GROUPS(G1, G2);
 
-void print_agents(const AgentGroup& group, MpiCommunicator& comm);
+void print_agents(const AgentGroup& group);
+
+Behavior<AgentBase> action_behavior {&AgentBase::action};
+Behavior<Agent1> goodbye_behavior {&Agent1::hello};
 
 int main(int argc, char** argv) {
 	FPMAS_REGISTER_AGENT_TYPES(Agent1, Agent2);
@@ -19,24 +23,26 @@ int main(int argc, char** argv) {
 	{
 		fpmas::model::Model<HardSyncMode> model;
 
-		AgentGroup& group_1 = model.buildGroup(G1);
-		AgentGroup& group_2 = model.buildGroup(G2);
 
-		// Adds two Agent1 to group_1 on each process
-		group_1.add(new Agent1);
-		group_1.add(new Agent1);
+		AgentGroup& group_1 = model.buildGroup(G1, action_behavior);
+		AgentGroup& group_2 = model.buildGroup(G2, goodbye_behavior);
 
-		// Adds an Agent1 and an Agent2 to group_2 on each process
+		// Adds an Agent1 and an Agent2 to group_1 on each process
+		group_1.add(new Agent1);
+		group_1.add(new Agent2);
+
+		// Adds two Agent1 to group_2 on each process
 		group_2.add(new Agent1);
-		group_2.add(new Agent2);
+		group_2.add(new Agent1);
 
-		print_agents(group_1, model.getMpiCommunicator());
-		print_agents(group_2, model.getMpiCommunicator());
+		print_agents(group_1);
+		print_agents(group_2);
 	}
 	fpmas::finalize();
 }
 
-void print_agents(const AgentGroup& group, MpiCommunicator& comm) {
+void print_agents(const AgentGroup& group) {
+	auto& comm = fpmas::communication::WORLD;
 	for(int rank = 0; rank < comm.getSize(); rank++) {
 		FPMAS_ON_PROC(comm, rank) {
 			std::cout
@@ -44,8 +50,8 @@ void print_agents(const AgentGroup& group, MpiCommunicator& comm) {
 				<< comm.getRank() << ":" << std::endl;
 			for(auto agent : group.localAgents()) {
 				std::cout
-					<< "- ID: " << agent->get()->node()->getId()
-					<< ", Type: " << agent->get()->typeId().name()
+					<< "- ID: " << agent->node()->getId()
+					<< ", Type: " << agent->typeId().name()
 					<< std::endl;
 			}
 			if(rank == comm.getSize()-1)

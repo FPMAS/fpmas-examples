@@ -21,7 +21,7 @@ void print_agents(const AgentGroup& group, int rank) {
 	nlohmann::json json_agents = nlohmann::json::array();
 	// Pushes (and serizalize) agents into the json array
 	for(auto agent : group.agents())
-		json_agents.push_back(*agent);
+		json_agents.push_back(agent->node()->data());
 	// Prints
 	std::cout << "[Proc " << rank << "] Agents :" << std::endl;
 	std::cout << json_agents.dump(4) << std::endl;
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 	{
 		// Instantiates a DefaultModel
 		fpmas::model::Model<HardSyncMode> model;
-		MpiCommunicator& comm = model.getMpiCommunicator();
+		fpmas::api::communication::MpiCommunicator& comm = model.getMpiCommunicator();
 
 		// Build a new agent group
 		AgentGroup& agent_group = model.buildGroup(Group);
@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 		fpmas::api::graph::PartitionMap map;
 		// Assign each agent's node to proc 1
 		for(auto agent : agent_group.agents())
-			map[agent->get()->node()->getId()] = 1;
+			map[agent->node()->getId()] = 1;
 
 		// Distributes agent nodes
 		// According to the map above, the 3 agents are sent to proc 1
