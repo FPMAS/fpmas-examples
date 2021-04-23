@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(fpmas-agent-interactions)
 
-find_package(fpmas REQUIRED)
+find_package(fpmas 1.1 REQUIRED)
 
 if(NOT SYNC_MODE)
 	message(FATAL_ERROR

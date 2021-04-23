@@ -3,6 +3,7 @@
 
 using fpmas::synchro::GhostMode;
 using fpmas::synchro::HardSyncMode;
+using fpmas::model::Behavior;
 
 #define SYNC_MODE ${SYNC_MODE}
 
@@ -12,7 +13,9 @@ FPMAS_DEFINE_GROUPS(DataGroup, ReaderWriterGroup);
 FPMAS_DEFINE_LAYERS(RW_TO_DATA);
 
 void build_model(fpmas::model::Model<SYNC_MODE>& model, fpmas::api::model::AgentGroup& group);
-void print_write_operations_count(fpmas::communication::MpiCommunicator& comm, fpmas::api::model::AgentGroup& group);
+void print_write_operations_count(fpmas::api::communication::MpiCommunicator& comm, fpmas::api::model::AgentGroup& group);
+
+Behavior<ReaderWriterBehavior> behavior {&ReaderWriterBehavior::behavior};
 
 int main(int argc, char** argv) {
 	FPMAS_REGISTER_AGENT_TYPES(AGENT_TYPES)
@@ -22,7 +25,7 @@ int main(int argc, char** argv) {
 		fpmas::model::Model<SYNC_MODE> model;
 
 		// Defines an agent group
-		fpmas::model::AgentGroup& group = model.buildGroup(ReaderWriterGroup);
+		fpmas::model::AgentGroup& group = model.buildGroup(ReaderWriterGroup, behavior);
 		
 		// Set up agents on process 0
 		FPMAS_ON_PROC(model.getMpiCommunicator(), 0) {
@@ -33,7 +36,7 @@ int main(int argc, char** argv) {
 		model.scheduler().schedule(0, model.loadBalancingJob());
 
 		// Schedules agent group execution
-		model.scheduler().schedule(0.1, 1, group.job());
+		model.scheduler().schedule(0.1, 1, group.jobs());
 		
 		// Runs the model for 2 iterations
 		model.runtime().run(4);
@@ -57,24 +60,25 @@ void build_model(fpmas::model::Model<SYNC_MODE>& model, fpmas::api::model::Agent
 	}
 }
 
-void print_write_operations_count(fpmas::communication::MpiCommunicator& comm, fpmas::api::model::AgentGroup& group) {
+void print_write_operations_count(
+		fpmas::api::communication::MpiCommunicator& comm,
+		fpmas::api::model::AgentGroup& group) {
 	int write_received = 0;
 	for(auto* agent : group.localAgents())
 		if(auto* data_agent = dynamic_cast<DataAgent*>(agent))
 			write_received+=data_agent->received_write_count;
 
 	fpmas::communication::TypedMpi<int> mpi(comm);
-	std::vector<int> write_emitted_counts = mpi.gather(ReaderWriterAgent::emitted_write_count, 0);
-	std::vector<int> write_received_counts = mpi.gather(write_received, 0);
+	int total_write_emitted_count =
+		fpmas::communication::reduce(mpi, 0, ReaderWriterAgent::emitted_write_count);
+	int total_write_received_count =
+		fpmas::communication::reduce(mpi, 0, write_received);
 	FPMAS_ON_PROC(comm, 0) {
-		int total_write_emitted_count = std::accumulate(
-				write_emitted_counts.begin(),
-				write_emitted_counts.end(), 0);
-		std::cout << "Total write operations emitted: " << total_write_emitted_count << std::endl;
-
-		int total_write_received_count = std::accumulate(
-				write_received_counts.begin(),
-				write_received_counts.end(), 0);
-		std::cout << "Total write operations received: " << total_write_received_count << std::endl;
+		std::cout
+			<< "Total write operations emitted: "
+			<< total_write_emitted_count << std::endl;
+		std::cout
+			<< "Total write operations received: "
+			<< total_write_received_count << std::endl;
 	}
 }
