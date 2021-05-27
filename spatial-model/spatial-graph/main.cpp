@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 		
 		fpmas::io::DynamicFileOutput output_file(
 				"graph.%r.%t.json",
-				model.getMpiCommunicator().getRank(), model.runtime()
+				model.getMpiCommunicator(), model.runtime()
 				);
 		fpmas::io::JsonOutput<fpmas::api::model::AgentGraph&> json_output(
 				output_file,
