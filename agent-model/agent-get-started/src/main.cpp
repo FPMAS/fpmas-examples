@@ -2,30 +2,32 @@
 #include "agents.h"
 
 #define NUM_STEP 4
-#define AGENT_TYPES Agent1, Agent2
 
-FPMAS_JSON_SET_UP(AGENT_TYPES)
+FPMAS_JSON_SET_UP(Agent)
 
 using fpmas::model::Model;
 using fpmas::synchro::HardSyncMode;
 using fpmas::model::AgentGroup;
+using fpmas::model::Behavior;
 
-FPMAS_DEFINE_GROUPS(Group);
+FPMAS_DEFINE_GROUPS(GROUP);
 
 int main(int argc, char** argv) {
-	FPMAS_REGISTER_AGENT_TYPES(AGENT_TYPES);
+	FPMAS_REGISTER_AGENT_TYPES(Agent);
 
 	fpmas::init(argc, argv);
 	{
 		// Instantiates a Model
 		Model<HardSyncMode> model;
 
-		// Build a new agent group
-		AgentGroup& agent_group = model.buildGroup(Group);
+		// Agent Behavior
+		Behavior<Agent> behavior {&Agent::behavior};
+		// Build a new agent group associated to behavior
+		AgentGroup& agent_group = model.buildGroup(GROUP, behavior);
 
-		// On each process, adds an agent of each type
-		agent_group.add(new Agent1);
-		agent_group.add(new Agent2);
+		// Adds two Agents to the group
+		agent_group.add(new Agent);
+		agent_group.add(new Agent);
 
 		// Schedules the group to be executed at each iteration
 		model.scheduler().schedule(0, 1, agent_group.jobs());
