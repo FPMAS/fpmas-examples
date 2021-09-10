@@ -3,23 +3,16 @@
 #include "fpmas/model/model.h"
 #include "fpmas/model/serializer.h"
 
-class Agent1 : public fpmas::model::AgentBase<Agent1> {
+class Agent : public fpmas::model::AgentBase<Agent> {
 	private:
 		int count;
 		std::string message;
 	public:
-		Agent1(int count, std::string message)
+		Agent(int count, std::string message)
 			: count(count), message(message) {}
 
-		static void to_json(nlohmann::json& j, const Agent1* agent); 
-		static Agent1* from_json(const nlohmann::json& j); 
+		static void to_json(nlohmann::json& j, const Agent* agent); 
+		static Agent* from_json(const nlohmann::json& j); 
 
-		void act() override;
+		void behavior();
 };
-
-class Agent2 : public fpmas::model::AgentBase<Agent2> {
-	public:
-		void act() override;
-};
-
-FPMAS_DEFAULT_JSON(Agent2)
