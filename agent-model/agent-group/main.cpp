@@ -8,35 +8,36 @@ using fpmas::synchro::HardSyncMode;
 using fpmas::communication::MpiCommunicator;
 using fpmas::model::AgentGroup;
 using fpmas::model::Behavior;
+using fpmas::model::Model;
 
 FPMAS_JSON_SET_UP(Agent1, Agent2);
-FPMAS_DEFINE_GROUPS(G1, G2);
+FPMAS_DEFINE_GROUPS(G0, G1);
 
 void print_agents(const AgentGroup& group);
-
-Behavior<AgentBase> action_behavior {&AgentBase::action};
-Behavior<Agent1> goodbye_behavior {&Agent1::hello};
 
 int main(int argc, char** argv) {
 	FPMAS_REGISTER_AGENT_TYPES(Agent1, Agent2);
 	fpmas::init(argc, argv);
 	{
-		fpmas::model::Model<HardSyncMode> model;
+		Model<HardSyncMode> model;
 
+		Behavior<AgentBehavior1> behavior_1 {&AgentBehavior1::behavior_1};
+		Behavior<Agent1> behavior_0 {&Agent1::behavior_0};
 
-		AgentGroup& group_1 = model.buildGroup(G1, action_behavior);
-		AgentGroup& group_2 = model.buildGroup(G2, goodbye_behavior);
+		AgentGroup& group_0 = model.buildGroup(G0, behavior_0);
+		AgentGroup& group_1 = model.buildGroup(G1, behavior_1);
+
+		Agent1* shared_agent_1 = new Agent1;
+		// Adds two Agent1 to group_0 on each process
+		group_0.add(shared_agent_1); // Belongs to group 0 and 1
+		group_0.add(new Agent1); // Belongs only to group 0
 
 		// Adds an Agent1 and an Agent2 to group_1 on each process
-		group_1.add(new Agent1);
-		group_1.add(new Agent2);
+		group_1.add(shared_agent_1); // Belongs to group 0 and 1
+		group_1.add(new Agent2); // Belongs only to group 1
 
-		// Adds two Agent1 to group_2 on each process
-		group_2.add(new Agent1);
-		group_2.add(new Agent1);
-
+		print_agents(group_0);
 		print_agents(group_1);
-		print_agents(group_2);
 	}
 	fpmas::finalize();
 }
