@@ -8,31 +8,33 @@ using fpmas::synchro::HardSyncMode;
 using fpmas::communication::MpiCommunicator;
 using fpmas::model::AgentGroup;
 using fpmas::model::Behavior;
+using fpmas::model::Model;
 
 FPMAS_JSON_SET_UP(Agent1, Agent2);
 FPMAS_DEFINE_GROUPS(G0, G1);
 
 void print_agents(const AgentGroup& group);
 
-Behavior<AgentBase> action_behavior {&AgentBase::action};
-Behavior<Agent1> hello_behavior {&Agent1::hello};
-
 int main(int argc, char** argv) {
 	FPMAS_REGISTER_AGENT_TYPES(Agent1, Agent2);
 	fpmas::init(argc, argv);
 	{
-		fpmas::model::Model<HardSyncMode> model;
+		Model<HardSyncMode> model;
 
-		AgentGroup& group_0 = model.buildGroup(G0, action_behavior);
-		AgentGroup& group_1 = model.buildGroup(G1, hello_behavior);
+		Behavior<AgentBehavior1> behavior_1 {&AgentBehavior1::behavior_1};
+		Behavior<Agent1> behavior_0 {&Agent1::behavior_0};
 
-		// Adds an Agent1 and an Agent2 to group_0 on each process
-		group_0.add(new Agent1);
-		group_0.add(new Agent2);
+		AgentGroup& group_0 = model.buildGroup(G0, behavior_0);
+		AgentGroup& group_1 = model.buildGroup(G1, behavior_1);
 
-		// Adds two Agent1 to group_1 on each process
-		group_1.add(new Agent1);
-		group_1.add(new Agent1);
+		Agent1* shared_agent_1 = new Agent1;
+		// Adds two Agent1 to group_0 on each process
+		group_0.add(shared_agent_1); // Belongs to group 0 and 1
+		group_0.add(new Agent1); // Belongs only to group 0
+
+		// Adds an Agent1 and an Agent2 to group_1 on each process
+		group_1.add(shared_agent_1); // Belongs to group 0 and 1
+		group_1.add(new Agent2); // Belongs only to group 1
 
 		// Task to print time steps from process 0
 		fpmas::scheduler::detail::LambdaTask print_time_step([&model] () {
@@ -57,11 +59,11 @@ int main(int argc, char** argv) {
 		model.scheduler().schedule(0.2, 2, group_1.jobs());
 
 		// Task to print group_0
-		fpmas::scheduler::detail::LambdaTask print_group_0([&group_0, &model] () {
+		fpmas::scheduler::detail::LambdaTask print_group_0([&group_0] () {
 				print_agents(group_0);
 				});
 		// Task to print group_1
-		fpmas::scheduler::detail::LambdaTask print_group_1([&group_1, &model] () {
+		fpmas::scheduler::detail::LambdaTask print_group_1([&group_1] () {
 				print_agents(group_1);
 				});
 

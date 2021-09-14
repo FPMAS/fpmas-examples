@@ -1,33 +1,22 @@
 #include "fpmas/model/model.h"
 #include "fpmas/model/serializer.h"
 
-class AgentBase {
+class AgentBehavior1 {
 	public:
-		virtual void action() = 0;
+		virtual void behavior_1() = 0;
 };
 
-class Agent1 : public fpmas::model::AgentBase<Agent1>, public AgentBase {
+class Agent1 : public fpmas::model::AgentBase<Agent1>, public AgentBehavior1 {
 	public:
-		void action() override {
-			std::cout << "[Agent 1] Agent "
-				<< FPMAS_C_STR(this->node()->getId()) << " acts."
-				<< std::endl;
-		}
+		void behavior_0();
 
-		void hello() {
-			std::cout << "[Agent 1] Hello from Agent "
-				<< FPMAS_C_STR(this->node()->getId())
-				<< std::endl;
-		}
+		void behavior_1() override;
 };
 FPMAS_DEFAULT_JSON(Agent1);
 
-class Agent2 : public fpmas::model::AgentBase<Agent2>, public AgentBase {
+class Agent2 : public fpmas::model::AgentBase<Agent2>, public AgentBehavior1 {
 	public:
-		void action() override {
-			std::cout << "[Agent 2] Agent "
-				<< FPMAS_C_STR(this->node()->getId()) << " acts."
-				<< std::endl;
-		}
+		void behavior_1() override;
 };
 FPMAS_DEFAULT_JSON(Agent2);
+

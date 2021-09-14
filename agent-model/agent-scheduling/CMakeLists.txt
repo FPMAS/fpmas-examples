@@ -5,6 +5,7 @@ project(fpmas-agent-scheduling)
 find_package(fpmas 1.1 REQUIRED)
 
 add_executable(fpmas-agent-scheduling
+	agents.cpp
 	main.cpp)
 
 target_link_libraries(fpmas-agent-scheduling PUBLIC fpmas::fpmas)
