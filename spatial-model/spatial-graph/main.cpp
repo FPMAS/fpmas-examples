@@ -3,18 +3,23 @@
 
 #define AGENT_TYPES Agent::JsonBase, GraphCell::JsonBase
 
+using namespace fpmas::model;
 using fpmas::synchro::HardSyncMode;
 
 FPMAS_JSON_SET_UP(AGENT_TYPES);
 
 FPMAS_DEFINE_GROUPS(GROUP);
 
-fpmas::model::Behavior<Agent> move_behavior {&Agent::move};
+Behavior<Agent> move_behavior {&Agent::move};
 
 void init_uniform_graph(SpatialModel<HardSyncMode, GraphCell>& model);
 
 int main(int argc, char** argv) {
-	FPMAS_REGISTER_AGENT_TYPES(AGENT_TYPES)
+	FPMAS_REGISTER_AGENT_TYPES(AGENT_TYPES);
+
+	// A custom seed to control graph and agents initialization
+	fpmas::seed(8);
+
 	fpmas::init(argc, argv);
 	{
 		// Defines a default model
@@ -26,20 +31,19 @@ int main(int argc, char** argv) {
 		GraphRange<>::synchronize(model);
 
 		// Defines an agent group
-		fpmas::api::model::MoveAgentGroup<GraphCell>& group
+		MoveAgentGroup<GraphCell>& group
 			= model.buildMoveGroup(GROUP, move_behavior);
 
 		// Builds Agents using a `new Agent` statement
-		fpmas::model::DefaultSpatialAgentFactory<Agent> agent_factory;
+		DefaultSpatialAgentFactory<Agent> agent_factory;
 		// Assigns two Agents to random GraphCells
-		fpmas::model::UniformAgentMapping mapping(
+		UniformAgentMapping mapping(
 				model.getMpiCommunicator(), // MPI communicator
 				model.cellGroup(), // Available cells
-				2, // Number of agents to initialize
-				8ul // Some random seed
+				2 // Number of agents to initialize
 				);
 		// SpatialAgentBuilder algorithm
-		fpmas::model::SpatialAgentBuilder<GraphCell> agent_builder;
+		SpatialAgentBuilder<GraphCell> agent_builder;
 
 		agent_builder.build(
 			model, // SpatialModel
@@ -74,12 +78,10 @@ int main(int argc, char** argv) {
  * Builds a cell graph
  */
 void init_uniform_graph(SpatialModel<HardSyncMode, GraphCell>& model) {
-	// Random generator
-	fpmas::random::DistributedGenerator<> rd;
 	// Edge count distribution: uniform between 1 and 3
 	fpmas::random::UniformIntDistribution<std::size_t> edge_dist(1, 3);
 	// Graph builder instance
-	DistributedUniformGraphBuilder builder(rd, edge_dist);
+	DistributedUniformGraphBuilder builder(edge_dist);
 
 	// Node builder: used to dynamically instantiate GraphCells on each process
 	DistributedAgentNodeBuilder cell_builder(

@@ -7,7 +7,8 @@ class Agent : public SpatialAgent<Agent, GraphCell> {
 		static const GraphRange<> mobility_range;
 		static const GraphRange<> perception_range;
 
-		Agent() : SpatialAgent<Agent, GraphCell>(mobility_range, perception_range) {}
+		FPMAS_MOBILITY_RANGE(mobility_range);
+		FPMAS_PERCEPTION_RANGE(perception_range);
 
 		void move();
 };
