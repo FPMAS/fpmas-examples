@@ -9,12 +9,13 @@ if(NOT SYNC_MODE)
 "Undefined SYNC_MODE.
 Please use the -DSYNC_MODE=[GhostMode/HardSyncMode] cmake option.")
 endif()
-configure_file(main.cpp.in main.cpp)
 
 add_executable(${PROJECT_NAME}
 	${CMAKE_CURRENT_BINARY_DIR}/main.cpp
 	src/agents.cpp)
 include_directories(include)
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC SYNC_MODE=${SYNC_MODE})
 
 target_link_libraries(${PROJECT_NAME} fpmas::fpmas)
 

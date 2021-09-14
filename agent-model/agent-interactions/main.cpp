@@ -5,7 +5,9 @@ using fpmas::synchro::GhostMode;
 using fpmas::synchro::HardSyncMode;
 using fpmas::model::Behavior;
 
-#define SYNC_MODE ${SYNC_MODE}
+#ifndef SYNC_MODE
+#define SYNC_MODE HardSyncMode
+#endif
 
 FPMAS_JSON_SET_UP(AGENT_TYPES);
 
