@@ -1,19 +1,19 @@
 #include "agents.h"
 
 void Agent1::behavior_0() {
-	std::cout << "[Agent 1] Hello from Agent "
+	std::cout << "[Agent1] Agent "
 		<< FPMAS_C_STR(this->node()->getId())
-		<< std::endl;
+		<< " executes behavior_0()" << std::endl;
 }
 
 void Agent1::behavior_1() {
-	std::cout << "[Agent 1] Agent "
-		<< FPMAS_C_STR(this->node()->getId()) << " acts."
-		<< std::endl;
+	std::cout << "[Agent1] Agent "
+		<< FPMAS_C_STR(this->node()->getId())
+		<< " executes behavior_1()" << std::endl;
 }
 
 void Agent2::behavior_1() {
-	std::cout << "[Agent 2] Agent "
-		<< FPMAS_C_STR(this->node()->getId()) << " acts."
-		<< std::endl;
+	std::cout << "[Agent2] Agent "
+		<< FPMAS_C_STR(this->node()->getId())
+		<< " executes behavior_1()" << std::endl;
 }
