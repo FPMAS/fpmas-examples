@@ -41,9 +41,8 @@ class EatingGridAgent : public GridAgent<EatingGridAgent, GrowingGridCell> {
 		static const VonNeumannRange<VonNeumannGrid<GrowingGridCell>> perception_range;
 
 	public:
-		EatingGridAgent() : GridAgent<EatingGridAgent, GrowingGridCell>(
-				mobility_range, perception_range
-				) {}
+		FPMAS_MOBILITY_RANGE(mobility_range);
+		FPMAS_PERCEPTION_RANGE(perception_range);
 
 		/**
 		 * EatingGridAgent behavior.
