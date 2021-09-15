@@ -17,9 +17,6 @@ void init_uniform_graph(SpatialModel<HardSyncMode, GraphCell>& model);
 int main(int argc, char** argv) {
 	FPMAS_REGISTER_AGENT_TYPES(AGENT_TYPES);
 
-	// A custom seed to control graph and agents initialization
-	fpmas::seed(8);
-
 	fpmas::init(argc, argv);
 	{
 		// Defines a default model
