@@ -4,10 +4,11 @@ using namespace fpmas::model;
 
 class GridAgentExample : public GridAgent<GridAgentExample> {
 	private:
-		static MooreRange<VonNeumannGrid<>> range;
+		static const MooreRange<VonNeumannGrid<>> range;
 
 	public:
-		GridAgentExample() : GridAgent<GridAgentExample>(range, range) {}
+		FPMAS_MOBILITY_RANGE(range);
+		FPMAS_PERCEPTION_RANGE(range);
 
 		/**
 		 * Agent behavior.

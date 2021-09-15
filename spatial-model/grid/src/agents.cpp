@@ -1,6 +1,6 @@
 #include "agents.h"
 
-MooreRange<VonNeumannGrid<>> GridAgentExample::range(1);
+const MooreRange<VonNeumannGrid<>> GridAgentExample::range(1);
 
 void GridAgentExample::move() {
 	std::cout
@@ -12,7 +12,9 @@ void GridAgentExample::move() {
 		std::cout << agent->node()->getId() << " ";
 	std::cout << "]" << std::endl;
 	
-	// Gets GraphCells currently in the agent mobility field
+	// Gets GraphCells currently in the agent mobility field.
+	// In this examples, this represents the 8 Moore neighbor cells, and the
+	// current location cell.
 	auto mobility_field = this->mobilityField();
 
 	// Selects a random GridCell from the mobility field

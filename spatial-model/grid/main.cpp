@@ -4,20 +4,22 @@
 
 FPMAS_JSON_SET_UP(AGENT_TYPES);
 
+using namespace fpmas::model;
 using fpmas::synchro::HardSyncMode;
 
 FPMAS_DEFINE_GROUPS(MOVE);
 
 int main(int argc, char** argv) {
-	fpmas::init(argc, argv);
 	FPMAS_REGISTER_AGENT_TYPES(AGENT_TYPES);
-	{
-		// Used to seed the global random neighbors selection
-		RandomNeighbors::seed(5489);
 
+	// Used to seed global random generators
+	fpmas::seed(549);
+
+	fpmas::init(argc, argv);
+	{
 		// Defines a new GridModel
 		GridModel<HardSyncMode> model;
-		// Defines a grid builder, that will build a grid of size (8*num_procs)x8
+		// Defines a grid builder, that will build a grid of size (4*num_procs)x4
 		VonNeumannGridBuilder<> grid_builder(
 				4*model.getMpiCommunicator().getSize(),
 				4
@@ -39,7 +41,7 @@ int main(int argc, char** argv) {
 		}
 
 		// GridAgentExample behavior
-		fpmas::model::Behavior<GridAgentExample> move_behavior {
+		Behavior<GridAgentExample> move_behavior {
 			&GridAgentExample::move
 		};
 		// Builds a new MoveAgentGroup associated to move_behavior
@@ -52,10 +54,12 @@ int main(int argc, char** argv) {
 				);
 		// Build agent instances with a `new GridAgentExample` statement
 		DefaultSpatialAgentFactory<GridAgentExample> factory;
-		// Initializes GridAgentExamples on the grid (distributed process)
+		// Initializes GridAgentExamples on the grid (distributed process).
+		// All agents are automatically added to the move_group.
 		GridAgentBuilder<>().build(
 				model, {move_group}, factory, mapping
 				);
+		model.graph().synchronize();
 
 
 		// Dynamic model output
