@@ -1,12 +1,14 @@
 #include "fpmas.h"
 #include "../utils/utils.h"
 
-#define DEFAULT_LAYER 0
-
 using fpmas::synchro::HardSyncMode;
 using fpmas::synchro::GhostMode;
 
 std::unordered_map<int, std::string> layers {{0, "DEFAULT_LAYER"}};
+
+FPMAS_DEFINE_LAYERS(DEFAULT_LAYER);
+
+FPMAS_JSON_SET_UP();
 
 int main(int argc, char** argv) {
 	fpmas::init(argc, argv);

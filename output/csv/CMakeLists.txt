@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(fpmas-output-csv)
 
-find_package(fpmas 1.1 REQUIRED)
+find_package(fpmas 1.2 REQUIRED)
 
 add_library(fpmas-output-csv
 	src/agent.cpp

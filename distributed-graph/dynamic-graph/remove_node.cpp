@@ -2,6 +2,8 @@
 
 using fpmas::synchro::SYNC_MODE;
 
+FPMAS_JSON_SET_UP();
+
 int main(int argc, char** argv) {
 
 	fpmas::init(argc, argv);

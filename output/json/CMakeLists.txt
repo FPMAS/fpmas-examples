@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(fpmas-output-json)
 
-find_package(fpmas 1.1 REQUIRED)
+find_package(fpmas 1.2 REQUIRED)
 
 add_library(fpmas-output-json
 	src/agent.cpp

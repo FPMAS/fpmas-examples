@@ -2,7 +2,9 @@
 #include <thread>
 #include <chrono>
 
-std::unordered_map<int, std::string> layers {{0, "INIT_LAYER"}, {1, "DYNAMIC_LAYER"}};
+std::unordered_map<int, std::string> layers {
+	{INIT_LAYER, "INIT_LAYER"}, {DYNAMIC_LAYER, "DYNAMIC_LAYER"}
+};
 
 void init_graph(
 		std::array<DistributedId, 5>& nodes,

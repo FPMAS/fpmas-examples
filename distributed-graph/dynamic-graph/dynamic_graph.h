@@ -1,8 +1,7 @@
 #include "fpmas.h"
 #include "../utils/utils.h"
 
-#define INIT_LAYER 0
-#define DYNAMIC_LAYER 1
+FPMAS_DEFINE_LAYERS(INIT_LAYER, DYNAMIC_LAYER);
 
 extern std::unordered_map<int, std::string> layers;
 

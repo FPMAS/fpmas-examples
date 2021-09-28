@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(fpmas-grid-cell-extension)
 
-find_package(fpmas 1.1 REQUIRED)
+find_package(fpmas 1.2 REQUIRED)
 
 add_executable(${PROJECT_NAME}
 	main.cpp

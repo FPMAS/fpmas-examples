@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(zoltan-load-balancing)
 
 
-find_package(fpmas REQUIRED)
+find_package(fpmas 1.2 REQUIRED)
 
 set(SYNC_MODE "HardSyncMode" CACHE STRING "Graph Synchronization mode")
 message("-- SYNC_MODE : ${SYNC_MODE}")

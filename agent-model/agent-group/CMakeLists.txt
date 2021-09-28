@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(fpmas-agent-group)
 
-find_package(fpmas 1.1 REQUIRED)
+find_package(fpmas 1.2 REQUIRED)
 
 add_executable(fpmas-agent-group
 	agents.cpp
