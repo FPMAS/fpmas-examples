@@ -1,6 +1,6 @@
 #include "fpmas.h"
 
-FPMAS_JSON_SET_UP();
+FPMAS_DEFAULT_JSON_SET_UP();
 
 
 static fpmas::random::DistributedGenerator<> gen;

@@ -1,6 +1,6 @@
 #include "fpmas.h"
 
-FPMAS_JSON_SET_UP()
+FPMAS_DEFAULT_JSON_SET_UP()
 
 int main(int argc, char** argv) {
 	fpmas::init(argc, argv);
