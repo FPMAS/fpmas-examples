@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 
 project(fpmas-agent-interactions)
 
@@ -11,12 +11,12 @@ Please use the -DSYNC_MODE=[GhostMode/HardSyncMode] cmake option.")
 endif()
 
 add_executable(${PROJECT_NAME}
-	${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+	main.cpp
 	src/agents.cpp)
+
+
 include_directories(include)
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC SYNC_MODE=${SYNC_MODE})
 
 target_link_libraries(${PROJECT_NAME} fpmas::fpmas)
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS YES)

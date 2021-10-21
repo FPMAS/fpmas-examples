@@ -14,8 +14,14 @@ FPMAS_JSON_SET_UP(AGENT_TYPES);
 FPMAS_DEFINE_GROUPS(DataGroup, ReaderWriterGroup);
 FPMAS_DEFINE_LAYERS(RW_TO_DATA);
 
-void build_model(fpmas::model::Model<SYNC_MODE>& model, fpmas::api::model::AgentGroup& group);
-void print_write_operations_count(fpmas::api::communication::MpiCommunicator& comm, fpmas::api::model::AgentGroup& group);
+void build_model(
+		fpmas::model::Model<SYNC_MODE>& model,
+		fpmas::api::model::AgentGroup& group
+		);
+void print_write_operations_count(
+		fpmas::api::communication::MpiCommunicator& comm,
+		fpmas::api::model::AgentGroup& group
+		);
 
 Behavior<ReaderWriterBehavior> behavior {&ReaderWriterBehavior::behavior};
 
@@ -48,15 +54,20 @@ int main(int argc, char** argv) {
 	fpmas::finalize();
 }
 
-void build_model(fpmas::model::Model<SYNC_MODE>& model, fpmas::api::model::AgentGroup& group) {
+void build_model(
+		fpmas::model::Model<SYNC_MODE>& model,
+		fpmas::api::model::AgentGroup& group
+		) {
 	for(int i = 0; i < model.getMpiCommunicator().getSize(); i++) {
 		group.add(new DataAgent(0, 0));
 	}
+	std::vector<fpmas::api::model::Agent*> data_agents = group.agents();
+
 	for(int i = 0; i < model.getMpiCommunicator().getSize(); i++) {
 		auto* rw_agent = new ReaderWriterAgent;
 		// Add rw_agent to the group BEFORE linking it
 		group.add(rw_agent);
-		for(auto* data_agent : group.agents()) {
+		for(auto* data_agent : data_agents) {
 			model.link(rw_agent, data_agent, RW_TO_DATA);
 		}
 	}
