@@ -8,7 +8,7 @@ std::unordered_map<int, std::string> layers {{0, "DEFAULT_LAYER"}};
 
 FPMAS_DEFINE_LAYERS(DEFAULT_LAYER);
 
-FPMAS_JSON_SET_UP();
+FPMAS_DEFAULT_JSON_SET_UP();
 
 int main(int argc, char** argv) {
 	fpmas::init(argc, argv);
